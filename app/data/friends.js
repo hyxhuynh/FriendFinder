@@ -2,7 +2,7 @@ var friendsArray = [
     {
         "name":"Shizuka",
         "photo": "https://cdn.pixilart.com/photos/large/03295c8d8e07924.jpg",
-        "scores":[
+        "choices":[
             5,
             1,
             4,
@@ -13,12 +13,13 @@ var friendsArray = [
             5,
             4,
             1
-        ]
+        ],
+        "total": 32
     },
     {
         "name":"Baymax",
         "photo":"https://www.yourwdwstore.net/assets/images/6/60000/6000/300/66335e.jpg",
-        "scores":[
+        "choices":[
             4,
             3,
             4,
@@ -28,8 +29,9 @@ var friendsArray = [
             2,
             1,
             3,
-            5
-        ]
+            2
+        ],
+        "total": 29
     }
   ];
   

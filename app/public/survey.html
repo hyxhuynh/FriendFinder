@@ -217,16 +217,16 @@
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
             <h2 class="modal-title"><strong>Your Best Match</strong></h2>
             </div>
             <div class="modal-body">
-            <h2 id="match-name">Shizuka</h2>
-            <img id="match-img" alt=" your best match's image" src="https://cdn.pixilart.com/photos/large/03295c8d8e07924.jpg" height = "200px">
+            <h2 id="match-name"></h2>
+            <img id="match-img" alt=" your best match's image" height = "200px">
             </div>
-            <div class="modal-footer">
+            <!-- <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
+            </div> -->
         </div>
 
         </div>
@@ -236,75 +236,109 @@
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script>
+
+    // Event Listener for the survey submit button
     $("#submit").on("click", function(event) {
-      event.preventDefault();
+        event.preventDefault();
 
-      function validateForm() {
-        // Set isValid to TRUE
-        var isValid = true;
-
-        // Check if Name and Link to Photo Image fields are filled
-        $(".form-control").each(function() {
-          if ($(this).val() === "") {
-            // If NOT filled, form is INVALID
-            isValid = false;
-          }
-        });
-
-        // Check if each question has answer chosen
-        $(".chosen-select").each(function() {
-          // If an answer is NOT chosen, form is INVALID
-          if ($(this).val() === "") {
-            isValid = false;
-          }
-        });
-        // return when var isValid is TRUE
-        return isValid;
-
-
-      }
-
-      // If all required fields are filled
-      if (validateForm()) {
-        // Create an object for the user's data
-        var userData = {
-            name: $("#name").val(),
-            photo: $("#photo").val(),
-            scores: [
-            $("#q1").val(),
-            $("#q2").val(),
-            $("#q3").val(),
-            $("#q4").val(),
-            $("#q5").val(),
-            $("#q6").val(),
-            $("#q7").val(),
-            $("#q8").val(),
-            $("#q9").val(),
-            $("#q10").val()
-            ]
-        };
+        var name = $("#name").val();
+        var photo = $("#photo").val();
         
-        // TODO:
-        // Working on the compare the difference between current user's scores against those from other users, question by question
+        var q1Score = parseInt($("#q1").val());
+        var q2Score = parseInt($("#q2").val());
+        var q3Score = parseInt($("#q3").val());
+        var q4Score = parseInt($("#q4").val());
+        var q5Score = parseInt($("#q5").val());
+        var q6Score = parseInt($("#q6").val());
+        var q7Score = parseInt($("#q7").val());
+        var q8Score = parseInt($("#q8").val());
+        var q9Score = parseInt($("#q9").val());
+        var q10Score = parseInt($("#q10").val());        
         
-        // TODO:
-        // Need works on the modal
-        var currentURL = window.location.origin;
-        $.post(currentURL + "/api/friends", userData, function(data) {
+        // create a user data object
+        var userData = { 
+            name: name,
+            photo: photo,
+            choices: [q1Score, q2Score, q3Score, q4Score, q5Score, q6Score, q7Score, q8Score, q9Score, q10Score],
+            total: q1Score + q2Score + q3Score + q4Score + q5Score + q6Score + q7Score + q8Score + q9Score + q10Score
+        }
+            
+        // Function to check the form is complete
+        function validateForm() {
+            // Set isValid to TRUE
+            var isValid = true;
 
-          // Grab the result from the AJAX post so that the best match's name and photo are displayed.
-          $("#match-name").text(data.name);
-          $("#match-img").attr("src", data.photo);
+            // If Name and Link to Photo Image fields are NOT filled 
+            // OR each question has NOT an answer chosen
+            // isValid is FALSE
+            $(".form-control").each(function() {
+                console.log($(this).val());
+                if ($(this).val() === "" || $(this).val() === null) {
+                    // If NOT filled, form is INVALID
+                    isValid = false;
+                }
+            });
 
-          // Show the modal with the best match
-          $("#results-modal").modal("toggle");
-        });
+            // return when var isValid is TRUE
+            return isValid;
+        }
+        
+        var bestMatchValue;
+        var bestMatchFriend;
+        var difference;
+        var differenceArr = [];
+        // Finding best match
+        function bestMatch(data) {
+            data.forEach(function(person){
+                // Find the absolute difference between the user's score and every person in the database
+                difference = Math.abs(userData.total - person.total);
+                // Push the differences calculated above into an array
+                differenceArr.push(difference);
+                console.log('person: ', person)
+                console.log("difference: ", difference)
+                console.log("Array ", differenceArr)
+            })
+            
+            // Set the initial values at index 0 in the database
+            bestMatchValue = differenceArr[0];
+            bestMatchFriend = data[0];
+            for (let i = 0; i < differenceArr.length; i++) {
+                // Loop through the array to find the index of the smallest value
+                // The index of the smallest value in the array equals to the index of the best match in the database
+                if (differenceArr[i] < bestMatchValue){
+                    bestMatchValue = differenceArr[i];
+                    bestMatchFriend = data[i];
+                    console.log("bestMatchValue: ", bestMatchValue)
+                    console.log("bestMatchFriend: ", data[i])
+                }
+                
+            }
 
-      } else {
-        alert("Please fill out all fields before submitting!");
-      }
+        }
 
+        // If all required fields are filled
+        if (validateForm()) {
 
+            var currentURL = window.location.origin;
+            
+            $.get(currentURL + "/api/friends", userData, function(data) {
+                bestMatch(data);
+            }).then(function(){
+                $.post(currentURL + "/api/friends", userData, function(data) {
+                    
+                    // Grab the result from the AJAX post so that the best match's name and photo are displayed.
+                    $("#match-name").html(bestMatchFriend.name);
+                    $("#match-img").attr("src", bestMatchFriend.photo);
+
+                    // Show the modal with the best match
+                    $("#results-modal").modal("toggle");
+                });
+            })
+        
+            // Alert user if the form is incomplete
+        } else {
+            alert("Please fill out all fields before submitting!");
+        }
     })
     </script>
 
