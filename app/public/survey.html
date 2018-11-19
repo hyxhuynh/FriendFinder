@@ -240,10 +240,12 @@
     // Event Listener for the survey submit button
     $("#submit").on("click", function(event) {
         event.preventDefault();
-
+        
+        // Fields for Name and Photo
         var name = $("#name").val();
         var photo = $("#photo").val();
         
+        // Parse the numerical values of the question choice 
         var q1Score = parseInt($("#q1").val());
         var q2Score = parseInt($("#q2").val());
         var q3Score = parseInt($("#q3").val());
@@ -255,11 +257,16 @@
         var q9Score = parseInt($("#q9").val());
         var q10Score = parseInt($("#q10").val());        
         
-        // create a user data object
+        // Create a user data object
         var userData = { 
+            // Name and Photo
             name: name,
             photo: photo,
+
+            // User's choice for each question
             choices: [q1Score, q2Score, q3Score, q4Score, q5Score, q6Score, q7Score, q8Score, q9Score, q10Score],
+            
+            // Total score of user's choices
             total: q1Score + q2Score + q3Score + q4Score + q5Score + q6Score + q7Score + q8Score + q9Score + q10Score
         }
             
@@ -294,9 +301,9 @@
                 difference = Math.abs(userData.total - person.total);
                 // Push the differences calculated above into an array
                 differenceArr.push(difference);
-                console.log('person: ', person)
-                console.log("difference: ", difference)
-                console.log("Array ", differenceArr)
+                // console.log('person: ', person)
+                // console.log("difference: ", difference)
+                // console.log("Array ", differenceArr)
             })
             
             // Set the initial values at index 0 in the database
@@ -320,9 +327,11 @@
         if (validateForm()) {
 
             var currentURL = window.location.origin;
-            
+            // GET the data of the best match friend
             $.get(currentURL + "/api/friends", userData, function(data) {
                 bestMatch(data);
+
+            
             }).then(function(){
                 $.post(currentURL + "/api/friends", userData, function(data) {
                     
@@ -335,7 +344,7 @@
                 });
             })
         
-            // Alert user if the form is incomplete
+        // Alert user if the form is incomplete
         } else {
             alert("Please fill out all fields before submitting!");
         }
