@@ -41,6 +41,6 @@ Download the files to your computer from https://github.com/hyxhuynh/FriendFinde
     * A POST routes `/api/friends`. This will be used to handle incoming survey results. This route will also be used to handle the compatibility logic. 
 
 * Initial friend data-objects are set up in `friends.js`.
-* To determine the user's most compatible friend, the absolute diffrence between the user's total scores and each friend's is calculated. This is done using `Math.abs()`. The friend with the smallest absolute difference is the most compatible friend to the user. 
+* To determine the user's most compatible friend, the absolute diffrence between the total scores of the user and each friend is calculated. This is done using `Math.abs()`. The friend with the smallest absolute difference is the most compatible friend to the user. 
 * Once the most compatible friend is found, a model with the name and picture will displayed. 
 * Error-checking mechanism is in place if command is invalid or missing.
